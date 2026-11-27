@@ -20,7 +20,7 @@ Read these before running anything: `AGENTS.md`/`CLAUDE.md`, `README.md`, `packa
 | Signal | Mode |
 |---|---|
 | API/worker only, no UI assets | **Backend** |
-| A command-line tool or batch pipeline (ingest, build, report) with no server | **CLI / pipeline** |
+| A command-line tool or batch job with no server to poll | **CLI / pipeline** |
 | UI only, talks to a mocked or remote API | **Frontend** |
 | Both a server and a UI in this repo, or compose with several services | **Full-stack** |
 | None of the above, or user names a special setup | **Custom** |
@@ -33,7 +33,7 @@ If two modes fit, state which you chose and why in one line. Ask only if running
 2. Install deps with the canonical command (`uv sync`, `pnpm install`, ...).
 3. Config comes from `.env` copied from `.env.example`. Never print secret values; show key names only. Never commit `.env`.
 4. Check ports are free before starting: `lsof -i :<port>`. If taken, report what holds it; do not kill processes you did not start.
-5. Docker: confirm the daemon is up (`docker info`; on this machine Colima: `colima status`, start with `colima start`).
+5. Docker: confirm the daemon is up (`docker info`). If it is not, start it the way the project's docs say. Do not guess a container runtime.
 6. Start long-running servers with `run_in_background`, redirect logs to the scratchpad directory, and poll a health endpoint rather than sleeping.
 7. Stop everything you started when done (see Cleanup).
 
@@ -48,14 +48,14 @@ If two modes fit, state which you chose and why in one line. Ask only if running
 
 ## Mode: CLI / pipeline
 
-For tools like an ingest-then-ask document bot, where there is no server to poll.
+For command-line tools and batch jobs, where there is no server to poll.
 
 1. Run the automated suite first. Fix nothing yet; note failures.
-2. Find the canonical commands in `AGENTS.md`/`README.md` and run them in their documented order on a small real input (for example ingest a folder, then ask a question the input can answer).
-3. Check the output of each step, not only the exit code: counts, generated files in the expected folder, cited sources in the answer.
-4. Run one failure case the change could affect: missing input, empty folder, or a question the data cannot answer. The tool must fail clearly or say it does not know, not invent output.
-5. If the project has an eval or golden set, run it and report the result. If it has no runner, say so; do not invent one.
-6. Confirm generated data (index, cache, output files) is gitignored (`git status`).
+2. Find the canonical commands in `AGENTS.md`/`README.md` and run them in their documented order on a small real input.
+3. Check the output of each step, not only the exit code: counts, generated files in the expected folder, and anything the tool is supposed to report.
+4. Run one failure case the change could affect: missing input, empty input, or input the tool cannot handle. The tool must fail clearly, not invent output.
+5. If the project documents an eval, benchmark, or project-level skill for this kind of change, run it and report the result. If it has none, say so; do not invent one.
+6. Confirm generated data (caches, indexes, output files) is gitignored (`git status`).
 
 ## Mode: Frontend
 
@@ -101,4 +101,4 @@ Stop background servers you started, `docker compose down` only for services you
 | Leaving servers or containers running | Run Cleanup every time |
 | Printing `.env` contents | Show key names only |
 | Swapping package managers | Follow the lockfile and project docs |
-| Trusting a CLI's exit code without reading its output | Check counts, files and cited sources |
+| Trusting a CLI's exit code without reading its output | Check counts, files and reported results |
