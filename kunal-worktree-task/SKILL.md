@@ -9,7 +9,11 @@ A worktree is a second checkout of the same repo in another folder. Use it so wo
 
 ## Ask first when
 
-The current checkout is a live install (a service, host, or containers read from it) or has uncommitted work. Say what you plan to do and ask before creating or removing anything.
+The current checkout is a live install (see "Live-install checkouts" in kunal-push-safety) or has uncommitted work. Say what you plan to do and ask before creating or removing anything.
+
+## Relationship to other worktree tools
+
+Claude Code's built-in worktree tool, `isolation: worktree` on subagents, and the superpowers `using-git-worktrees` skill all create worktrees too. Any of them is fine for creating one. The rules in this skill still apply on top: start from an exact base SHA, use `--no-track`, and run the **Verify** step in "Create" before editing anything, because those tools can silently start from `main` instead of your feature branch.
 
 ## Create
 
