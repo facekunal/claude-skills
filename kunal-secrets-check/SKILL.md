@@ -16,21 +16,19 @@ description: Use before any git commit, push, or pull request, and whenever read
 
 ## What to scan
 
-The staged changes and the commits about to be pushed:
+Run the bundled script from inside the repo. It scans the staged changes, and with `--base` also the files changed in the commits about to be pushed:
 
 ```bash
-git diff --cached --name-only
-git diff --cached -U0 | grep -nEi '(api[_-]?key|secret|token|passw(or)?d|private[_-]?key|bearer |authorization)' | sed -E 's/(=|:)[[:space:]]*.{4,}/\1 <redacted>/'
-git diff <remote>/<base>..HEAD --name-only
+~/.claude/skills/kunal-secrets-check/scan.sh                      # staged changes
+~/.claude/skills/kunal-secrets-check/scan.sh --base <remote>/<base>   # staged + commits about to be pushed
 ```
 
-Also look for these file names in the change set, whatever their content:
+It prints only `LEVEL file:line kind`. It never prints a matched value, so its output is safe to show. Do not replace it with a raw `git diff | grep`, because that prints the secret into the session before any redaction.
 
-- `.env`, `.env.*` (except `.env.example` with placeholder values)
-- `*.pem`, `*.key`, `id_rsa*`, `*.p12`, `credentials*.json`, `service-account*.json`
-- `settings.local.json`, `.npmrc`, `.netrc`, cloud config files with tokens
+- **BLOCK** (exit 1): real token shapes (AWS `AKIA…`, `ghp_`/`github_pat_`, `sk-`, Slack `xox[bp]-`, two-part JWTs, private-key headers) and forbidden file names (`.env` and `.env.*` except `.env.example`, `*.pem`, `*.key`, `*.p12`, `id_rsa*`, `credentials*.json`, `service-account*.json`, `settings.local.json`, `.npmrc`, `.netrc`).
+- **WARN** (exit 0): a key-like name (`api_key`, `secret`, `token`, `password`) assigned a long value. Look at each one by file and line, without printing the value, and decide.
 
-Known token shapes to flag: `AKIA...` (AWS), `ghp_` / `github_pat_`, `sk-` (API keys), `xox[bp]-` (Slack), `-----BEGIN ... PRIVATE KEY-----`, JWTs (`eyJ...`), long hex or base64 strings assigned to a key-like name.
+Untracked and unstaged files are not scanned. Stage the files first, or check them by name.
 
 If `gitleaks` or `trufflehog` is installed, run it as well and treat its findings as authoritative.
 
@@ -43,4 +41,4 @@ If `gitleaks` or `trufflehog` is installed, run it as well and treat its finding
 
 ## If nothing is found
 
-Say what you scanned (staged files, N commits against `<base>`). Do not claim the change is "safe", only that the scan found nothing.
+Say what you scanned (the script prints the file counts). Do not claim the change is "safe", only that the scan found nothing.
