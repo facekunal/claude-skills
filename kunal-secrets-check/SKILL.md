@@ -14,6 +14,10 @@ description: Use before any git commit, push, or pull request, and whenever read
   ```
 - Do not send secrets to any outside service or tool.
 
+## Enforced by a hook as well
+
+`hook.sh` in this folder runs `scan.sh` before every `git commit` (staged files) and `git push` (commits against the upstream), and denies on BLOCK findings only. It is wired in `~/.claude/settings.json`. Limits: it cannot see files that `git commit -a` or a `git add … && git commit` in the same command stage at run time, and it fails open when the repo path comes from a shell variable. The push check catches those once they are committed. Keep running the scan yourself before committing.
+
 ## What to scan
 
 Run the bundled script from inside the repo. It scans the staged changes, and with `--base` also the files changed in the commits about to be pushed:

@@ -5,6 +5,8 @@ description: Use before any `git push`, and when creating a branch from a remote
 
 # Push safety
 
+**Enforced by a hook as well.** `hook.sh` in this folder runs before every Bash command (wired in `~/.claude/settings.json`). It denies a `git push` when the branch's upstream is the default branch under a different name, or when a push from another branch names `main`/`master`. Force pushes are denied by `permissions.deny` rules. The hook fails open on anything it cannot work out, such as a path built from a shell variable, so the checks below still apply every time. If the hook denies a push, follow its message instead of working around it.
+
 A branch cut from `origin/main` with plain `checkout -b` tracks `origin/main`. A later `git push` then sends the commit straight to main. This has happened. Run these checks every time.
 
 ## Creating a branch
