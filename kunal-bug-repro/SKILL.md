@@ -1,11 +1,15 @@
 ---
 name: kunal-bug-repro
-description: Use when fixing a bug, a failing behavior, or a regression, before changing any code. Makes the bug visible first with a failing test or a minimal repro command, then fixes it, then proves the repro now passes.
+description: Use when fixing a bug, a failing test, a failing behavior, or a regression, or when the user says something is broken, before changing any code.
 ---
 
 # Reproduce before you fix
 
 A fix without a repro is a guess. Make the bug fail on purpose first, so the fix has something to prove.
+
+## Relationship to other skills
+
+If `superpowers:systematic-debugging` or `superpowers:test-driven-development` are available, use them for the investigation and test-writing craft. This skill sets the order and the report on top of them: repro first, watch it fail, fix, watch it pass, keep the test. If they disagree, this skill's order wins.
 
 ## Steps
 

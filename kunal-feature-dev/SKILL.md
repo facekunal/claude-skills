@@ -1,6 +1,6 @@
 ---
 name: kunal-feature-dev
-description: Use at the start of any feature development task - building a new feature, finishing a partly built one, or a multi-file change. Sonnet stays the main model and does the steady work; stronger models (Opus, Fable) are consulted at fixed checkpoints, and Haiku subagents do search and gathering. Covers audit, plan, slices, implement, wiring check, and a done check.
+description: Use at the start of any feature development task - building a new feature, finishing a partly built one, adding an endpoint or command, or making a multi-file change.
 ---
 
 # Feature development with model routing
@@ -8,6 +8,20 @@ description: Use at the start of any feature development task - building a new f
 The main session model (normally Sonnet) does the steady work. It does not trust its own judgment at the risky points. Stronger models are used at **fixed checkpoints**, and cheap models gather facts.
 
 **Standing authorization:** the user has authorized subagents for the delegation steps in this skill (Haiku gathering, Opus/Fable consults). Use them without asking again. Do not spawn agents for anything else.
+
+## Size the task first
+
+| Size | What counts | Checkpoints |
+|---|---|---|
+| **Small** | One slice, 2 files or fewer, no risky area | Skip A and C. Still run the repo's checks and report their output. B applies if it comes up. |
+| **Normal** | Anything else | A, B and C as written below. |
+| **Risky** | Touches security, concurrency, migrations, auth, money, or data deletion, at any size | A, B and C always. No skipping. |
+
+State the size in the announcement. If the work grows past Small, move up and run the checkpoints you skipped.
+
+## Relationship to other skills
+
+If `superpowers:brainstorming` or `superpowers:writing-plans` are available, use them for the design conversation and the written plan. The audit, wiring check, checkpoints and model routing below still apply on top of them.
 
 ## 0. Announce
 
@@ -24,13 +38,13 @@ For a big area, send the *looking* to Haiku subagents (`model: haiku`) and keep 
 
 ## 2. Find the pattern
 
-Before writing code, find the 2-3 closest existing features. List the conventions to copy: file layout, registration points, naming, error handling, test style. Check the repo's own docs (`CLAUDE.md`, `CONTRIBUTING.md`, `docs/`) for rules that apply to this change. Follow them. If a repo rule needs a design check (for example a main-thread or performance constraint), do that check now.
+Before writing code, find the 2-3 closest existing features. List the conventions to copy: file layout, registration points, naming, error handling, test style. Check the repo's own docs (`AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `docs/`) for rules that apply to this change. Follow them. If a repo rule needs a design check (for example a main-thread or performance constraint), do that check now.
 
 ## 3. Plan and slice
 
 Split the work into the smallest slices that each work end to end. Order them by dependency. For each slice: what changes, which files, how it will be tested.
 
-**CHECKPOINT A - plan review (mandatory).** Before writing code, get the plan reviewed by a stronger model: call `advisor` (it sees this whole conversation). For a standalone design question, use a subagent with `model: opus` or `model: fable` and a complete brief. Apply the feedback or tell the user why you disagree.
+**CHECKPOINT A - plan review (mandatory for Normal and Risky).** Before writing code, get the plan reviewed by a stronger model: call `advisor` (it sees this whole conversation). For a standalone design question, use a subagent with `model: opus` or `model: fable` and a complete brief. Apply the feedback or tell the user why you disagree.
 
 ## 4. Implement, one slice at a time
 
@@ -53,7 +67,7 @@ For the feature, search for every place a similar feature is registered: command
 
 ## 6. Done check
 
-**CHECKPOINT C - final review (mandatory).** Run tests, typecheck, and lint, and read the real output. Then re-read the original request and check each requirement against the diff. Call `advisor` for a review of the diff before saying the work is done.
+**CHECKPOINT C - final review (mandatory for Normal and Risky).** Run tests, typecheck, and lint, and read the real output. Then re-read the original request and check each requirement against the diff. Call `advisor` for a review of the diff before saying the work is done.
 
 Report: requirements met (with evidence), requirements not met, checks run and their results, anything skipped. Never say "done" if a check was not run or failed.
 
