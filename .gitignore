@@ -1,0 +1,7 @@
+# Track only my own skills. Everything else (synced claude.ai skills,
+# plugin-installed skills such as the LiveKit ones) is ignored.
+*
+!.gitignore
+!README.md
+!kunal-*/
+!kunal-*/**
