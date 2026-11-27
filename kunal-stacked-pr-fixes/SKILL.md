@@ -21,10 +21,14 @@ Every fix goes as a **new commit on the top branch of the stack**, even when the
    git status -sb          # must show it is up to date with origin/<top-branch>
    ```
 3. Read each review comment. Group them as must-fix, needs discussion, or not applicable. Give your reasoning before changing code.
-4. Make one focused commit per fix, or per tightly related group. The message names the PR it answers, for example `fix(x): handle empty list (review on #422)`.
+4. Make one focused commit per fix, or per tightly related group. The message names the PR it answers. Follow the repo's own commit convention (check `AGENTS.md`, `CONTRIBUTING.md`, and `git log`). If the repo has none, use something like `Fix empty list handling (review on #422)`.
 5. Run the checks the repo requires (tests, typecheck, lint) and read the results.
 6. Push normally. **No `--force`, no `--force-with-lease`.** If the push is rejected, stop and tell the user. Do not force.
-7. Reply on each thread, including threads on lower PRs, with the commit SHA and the PR it landed in.
+7. Reply on each thread, including threads on lower PRs, with the commit SHA and the PR it landed in:
+   ```bash
+   gh api -X POST repos/<owner>/<repo>/pulls/<pr-number>/comments/<comment-id>/replies -f body="Fixed in <sha>, landing in #<top-pr>."
+   ```
+   Get the `<comment-id>` from `gh api repos/<owner>/<repo>/pulls/<pr-number>/comments`. Do not resolve threads on someone else's review. Let the reviewer do that.
 
 ## Never
 
